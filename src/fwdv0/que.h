@@ -175,28 +175,31 @@ namespace fwdv0 {
       IterBase<Const> m_itr;
     };
 
+    using iterator = Iter<false>;
+    using const_iterator = Iter<true>;
+
     Iter<true> begin() const {
-      return Iter{beginBase()};
+      return Iter<true>{beginBase()};
     }
 
     Iter<false> begin() {
-      return Iter{beginBase()};
+      return Iter<false>{beginBase()};
     }
 
     Iter<true> end() const {
-      return Iter{endBase()};
+      return Iter<true>{endBase()};
     }
 
     Iter<false> end() {
-      return Iter{endBase()};
+      return Iter<false>{endBase()};
     }
 
     Iter<true> cbegin() const {
-      return Iter{beginBase()};
+      return Iter<true>{beginBase()};
     }
 
     Iter<true> cend() const {
-      return Iter{endBase()};
+      return Iter<true>{endBase()};
     }
 
     // === Insertion ===

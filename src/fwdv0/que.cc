@@ -17,6 +17,7 @@
 #include <fwdv0/que.h>
 #include <cstddef>
 #include <stdexcept>
+#include <new>
 
 namespace fwdv0 {
 

@@ -121,9 +121,11 @@ std::vector<std::pair<const char*, void (*)(TypeHyp&, TypeRef&)>> aDataChecker {
 };
 
 TEST_CASE("Read/Write test") {
-  for (const auto& [descW, W] : aDataMaker) {
-    for (const auto& [descC, C] : aDataChecker) {
-      CHECK(rc::check("W("s + descW + ") C(" + descC + ")", [&](InputData data) {
+  for (const auto& MakerPair : aDataMaker) {
+    for (const auto& CheckerPair : aDataChecker) {
+      const auto& W = MakerPair.second;
+      const auto& C = CheckerPair.second;
+      CHECK(rc::check("W("s + MakerPair.first + ") C(" + CheckerPair.first + ")", [&](InputData data) {
             auto [hyp, ref] = W(data);
             C(hyp, ref);
             }));

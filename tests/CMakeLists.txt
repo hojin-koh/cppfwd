@@ -7,8 +7,8 @@ if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 ## Sanitizers on debug mode
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address")
-set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=leak -fsanitize=address")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 ## Enforce c++17 usage
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "CMAKE_CXX_STANDARD")
@@ -36,21 +36,27 @@ target_link_libraries(test-program PRIVATE cppfwdv0)
 
 ## Link doctest
 include(FetchContent)
-FetchContent_Declare(doctest GIT_TAG v2.4.8 GIT_REPOSITORY https://github.com/onqtam/doctest.git)
+FetchContent_Declare(doctest
+  URL https://github.com/doctest/doctest/archive/refs/tags/v2.4.8.tar.gz
+  )
 FetchContent_MakeAvailable(doctest)
-target_compile_features(test-program PRIVATE cxx_std_17) # Needed by doctest but actually dupllicated with orig
+target_compile_features(test-program PRIVATE cxx_std_17) # Needed by doctest but actually duplicated with orig
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_TREAT_CHAR_STAR_AS_STRING)
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_SUPER_FAST_ASSERTS)
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_ASSERTION_PARAMETERS_BY_VALUE)
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_NO_WINDOWS_SEH)
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_NO_POSIX_SIGNALS)
 target_compile_definitions(test-program PRIVATE DOCTEST_CONFIG_INCLUDE_TYPE_TRAITS)
-target_link_libraries(test-program PRIVATE doctest::doctest)
+target_link_libraries(test-program PRIVATE doctest)
 
 ## Link rapidcheck
-FetchContent_Declare(rapidcheck GIT_TAG 8fafda42e732164db58003e542196e94a28481f9 GIT_REPOSITORY https://github.com/emil-e/rapidcheck.git)
+FetchContent_Declare(rapidcheck
+  URL https://github.com/emil-e/rapidcheck/tarball/8fafda42e732164db58003e542196e94a28481f9
+  PATCH_COMMAND sed -i "s/CMAKE_CXX_STANDARD 11/CMAKE_CXX_STANDARD 17/" <SOURCE_DIR>/CMakeLists.txt
+  )
 FetchContent_MakeAvailable(rapidcheck)
 target_link_libraries(test-program PRIVATE rapidcheck)
 
 add_custom_target(run COMMAND ${CMAKE_COMMAND} -E env RC_PARAMS="max_size=1001 max_success=333" $<TARGET_FILE:test-program> -fc DEPENDS test-program)
+
 

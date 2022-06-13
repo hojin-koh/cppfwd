@@ -40,7 +40,10 @@ namespace fwdv0 {
   // The base class responsible for manipulating memory
   struct QueBase {
     QueBase(size_t szElem, size_t nPerChunk) : m_szElem{szElem}, m_nPerChunk{nPerChunk} {};
+    // Move constructor is handled by QueBase, since we only need to move several pointers
+    // There's no copy constructor here, as that one is handled by Que, needing object construction
     QueBase(QueBase&& rhs);
+    // We delete all chunks in destructor, AFTER ~Que() called all objects' destructors
     ~QueBase();
 
     // Public Queries

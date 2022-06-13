@@ -86,7 +86,11 @@ namespace fwdv0 {
     size_t iLast = getIdInChunk(m_size-1);
     m_size++;
     if (iLast == m_nPerChunk-1) { // The beginning of a new chunk
-      p = m_pChunkBack = newChunk(p, nullptr);
+      if (p->pNext != nullptr) {
+        p = m_pChunkBack = p->pNext;
+      } else {
+        p = m_pChunkBack = newChunk(p, nullptr);
+      }
       return getElementPointerInChunk(p, 0);
     }
     return getElementPointerInChunk(p, iLast+1);
@@ -107,7 +111,11 @@ namespace fwdv0 {
     size_t iFirst = getIdInChunk(0);
     m_size++;
     if (m_offset == 0) { // The ending of a new chunk
-      p = m_pChunkFront = newChunk(nullptr, p);
+      if (p->pPrev != nullptr) {
+        p = m_pChunkFront = p->pPrev;
+      } else {
+        p = m_pChunkFront = newChunk(nullptr, p);
+      }
       m_offset = m_nPerChunk-1;
       return getElementPointerInChunk(p, m_nPerChunk-1);
     }

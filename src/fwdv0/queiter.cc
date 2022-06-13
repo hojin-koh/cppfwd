@@ -100,9 +100,18 @@ namespace fwdv0 {
 
   // Construction from the container
 
+  QueBase::IterBase<true> QueBase::beginBase() const {
+    return IterBase<true>{this, m_pChunkFront, m_offset};
+  }
 
   QueBase::IterBase<false> QueBase::beginBase() {
     return IterBase<false>{this, m_pChunkFront, m_offset};
+  }
+
+  QueBase::IterBase<true> QueBase::endBase() const {
+    auto id = getIdInChunk(m_size);
+    if (m_size > 0 && id == 0) return IterBase<true>{this, nullptr, 0};
+    return IterBase<true>{this, m_pChunkBack, id};
   }
 
   QueBase::IterBase<false> QueBase::endBase() {

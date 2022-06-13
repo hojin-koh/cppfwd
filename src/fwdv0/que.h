@@ -70,7 +70,9 @@ namespace fwdv0 {
       chunk_type m_pChunk;
       size_t m_idx;
     };
+    IterBase<true> beginBase() const;
     IterBase<false> beginBase();
+    IterBase<true> endBase() const;
     IterBase<false> endBase();
 
 
@@ -173,12 +175,27 @@ namespace fwdv0 {
       IterBase<Const> m_itr;
     };
 
-    // TODO: const version
+    Iter<true> begin() const {
+      return Iter{beginBase()};
+    }
+
     Iter<false> begin() {
       return Iter{beginBase()};
     }
 
+    Iter<true> end() const {
+      return Iter{endBase()};
+    }
+
     Iter<false> end() {
+      return Iter{endBase()};
+    }
+
+    Iter<true> cbegin() const {
+      return Iter{beginBase()};
+    }
+
+    Iter<true> cend() const {
       return Iter{endBase()};
     }
 

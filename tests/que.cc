@@ -95,6 +95,29 @@ std::vector<std::pair<const char*, void (*)(TypeHyp&, TypeRef&)>> aDataChecker {
       }
       RC_ASSERT(itr == itrEnd);
     }},
+  {"iterator-from-const", [](TypeHyp& hyp, TypeRef& ref)
+    {
+      const TypeHyp& chyp = hyp;
+      auto itr {chyp.begin()}, itrEnd {chyp.end()};
+      auto itrRef {ref.begin()}, itrRefEnd {ref.end()};
+      for (; itrRef != itrRefEnd; ++itr, ++itrRef) {
+        RC_ASSERT(itr->at(0) == *itrRef);
+        RC_ASSERT((*itr).at(0) == *itrRef);
+        RC_ASSERT(itr != itrEnd);
+      }
+      RC_ASSERT(itr == itrEnd);
+    }},
+  {"const iterator", [](TypeHyp& hyp, TypeRef& ref)
+    {
+      auto itr {hyp.cbegin()}, itrEnd {hyp.cend()};
+      auto itrRef {ref.cbegin()}, itrRefEnd {ref.cend()};
+      for (; itrRef != itrRefEnd; ++itr, ++itrRef) {
+        RC_ASSERT(itr->at(0) == *itrRef);
+        RC_ASSERT((*itr).at(0) == *itrRef);
+        RC_ASSERT(itr != itrEnd);
+      }
+      RC_ASSERT(itr == itrEnd);
+    }},
 };
 
 TEST_CASE("Read/Write test") {

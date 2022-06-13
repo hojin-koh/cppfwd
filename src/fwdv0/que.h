@@ -40,6 +40,8 @@ namespace fwdv0 {
   // The base class responsible for manipulating memory
   struct QueBase {
     QueBase(size_t szElem, size_t nPerChunk) : m_szElem{szElem}, m_nPerChunk{nPerChunk} {};
+    QueBase(QueBase&& rhs);
+    ~QueBase();
 
     // Public Queries
     size_t size() const;
@@ -102,8 +104,9 @@ namespace fwdv0 {
     char* getElementPointerInChunk(QueChunk* p, size_t i);
 
     // Memory manipulation
-    QueChunk* newChunk(QueChunk* pPrev, QueChunk* pNext);
     QueChunk* addInitialChunk();
+    QueChunk* newChunk(QueChunk* pPrev, QueChunk* pNext);
+    void deleteChunk(QueChunk* p);
   };
 
 
@@ -120,13 +123,26 @@ namespace fwdv0 {
         )
     };
 
-    // Default constructor
+    // Constructor
     Que() : QueBase(s_szElem, s_nPerChunk) {}
   //  Que(size_t n, const T& val); // fill constructor
   //  // range?
   //  // initializer?
-  //  ~Que() {
-  //  }
+
+    Que(Que<T>&& rhs) : QueBase(std::move(rhs)) {}
+
+    Que(const Que<T>& rhs) : QueBase(s_szElem, s_nPerChunk) {
+      for (const auto& obj : rhs) {
+        push_back(obj);
+      }
+    }
+
+    // The actually release of memory blocks is done by ~QueBase()
+    ~Que() {
+      for (const auto& obj : *this) {
+        obj.~T();
+      }
+    }
 
   //  // copy/move etc.
 
@@ -209,9 +225,19 @@ namespace fwdv0 {
       return *p;
     }
 
+    T& push_back(const T& obj) {
+      T* p = new (addElementBack()) T{obj};
+      return *p;
+    }
+
     template<typename... ARGS>
     T& emplace_front(ARGS&&... args) {
       T* p = new (addElementFront()) T{std::forward<ARGS>(args)...};
+      return *p;
+    }
+
+    T& push_front(const T& obj) {
+      T* p = new (addElementFront()) T{obj};
       return *p;
     }
   };

@@ -21,6 +21,37 @@
 
 namespace fwdv0 {
 
+  QueBase::QueBase(QueBase&& rhs) :
+    m_szElem{rhs.m_szElem}, m_nPerChunk{rhs.m_nPerChunk},
+    m_pChunkFront{rhs.m_pChunkFront}, m_pChunkBack{rhs.m_pChunkBack},
+    m_size{rhs.m_size}, m_offset{rhs.m_offset} {
+      rhs.m_size = 0;
+      rhs.m_offset = 0;
+      rhs.m_pChunkFront = rhs.m_pChunkBack = nullptr;
+  }
+
+  QueBase::~QueBase() {
+    QueChunk* p = m_pChunkFront;
+    if (p == nullptr) return;
+
+    // Delete everything before the front chunk
+    p = p->pPrev;
+    while (p != nullptr) {
+      QueChunk* q = p->pPrev;
+      deleteChunk(p);
+      p = q;
+    }
+
+    // Delete everything after the front chunk (inclusive)
+    p = m_pChunkFront;
+    while (p != nullptr) {
+      QueChunk* q {p->pNext};
+      deleteChunk(p);
+      p = q;
+    }
+    m_pChunkFront = m_pChunkBack = nullptr;
+  }
+
   // === Public Queries ===
 
   size_t QueBase::size() const {
@@ -131,7 +162,6 @@ namespace fwdv0 {
     return m_pChunkFront;
   }
 
-  // Allocate
   QueChunk* QueBase::newChunk(QueChunk* pPrev, QueChunk* pNext) {
     static constexpr size_t overhead {offsetof(QueChunk, data)};
     const size_t szAllocate {m_szElem*m_nPerChunk+overhead};
@@ -143,5 +173,9 @@ namespace fwdv0 {
     return p;
   }
 
+  void QueBase::deleteChunk(QueChunk* pChunk) {
+    char* p {reinterpret_cast<char*>(pChunk)};
+    operator delete[](p, std::align_val_t{alignof(QueChunk)});
+  }
 
 }

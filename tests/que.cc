@@ -11,8 +11,8 @@ using namespace std::string_literals;
 
 TEST_CASE("Default-constructable and copyable/movable") {
   Que<int> empty;
-  //Que<int> empty2 {empty};
-  //Que<int> empty3 {std::move(empty2)};
+  Que<int> empty2 {empty};
+  Que<int> empty3 {std::move(empty2)};
   //empty2 = empty;
   //empty3 = std::move(empty);
 }
@@ -35,6 +35,18 @@ std::vector<std::pair<const char*, PairRef (*)(InputData)>> aDataMaker {
       }
       return {hyp, ref};
     }},
+  {"push_back", [](InputData data) -> PairRef
+    {
+      TypeHyp hyp;
+      TypeRef ref;
+      RC_ASSERT(hyp.size() == 0);
+      for (const auto& val : data) {
+        TypeRef obj; obj.push_back(val);
+        hyp.push_back(obj);
+        ref.push_back(val);
+      }
+      return {hyp, ref};
+    }},
   {"emplace_front", [](InputData data) -> PairRef
     {
       TypeHyp hyp;
@@ -44,6 +56,18 @@ std::vector<std::pair<const char*, PairRef (*)(InputData)>> aDataMaker {
         auto& obj = hyp.emplace_front();
         obj.emplace_front(val);
         ref.emplace_front(val);
+      }
+      return {hyp, ref};
+    }},
+  {"push_front", [](InputData data) -> PairRef
+    {
+      TypeHyp hyp;
+      TypeRef ref;
+      RC_ASSERT(hyp.size() == 0);
+      for (const auto& val : data) {
+        TypeRef obj; obj.push_front(val);
+        hyp.push_front(obj);
+        ref.push_front(val);
       }
       return {hyp, ref};
     }},
@@ -59,6 +83,23 @@ std::vector<std::pair<const char*, PairRef (*)(InputData)>> aDataMaker {
         } else {
           auto& obj2 = hyp.emplace_back();
           obj2.emplace_back(val);
+          ref.push_back(val);
+        }
+      }
+      return {hyp, ref};
+    }},
+  {"push_mixed", [](InputData data) -> PairRef
+    {
+      TypeHyp hyp;
+      TypeRef ref;
+      RC_ASSERT(hyp.size() == 0);
+      for (const auto& val : data) {
+        TypeRef obj; obj.push_back(val);
+        if (val%2==0) {
+          hyp.push_front(obj);
+          ref.push_front(val);
+        } else {
+          hyp.push_back(obj);
           ref.push_back(val);
         }
       }
